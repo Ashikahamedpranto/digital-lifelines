@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 import 'party_game_connect_screen.dart';
-import 'party_game_pair_code_screen.dart';
 import 'party_game_host_screen.dart';
 import '../../data/party_questions.dart';
 
@@ -68,24 +67,6 @@ class PartyGameScreen extends StatelessWidget {
                 },
                 icon: const Icon(Icons.bluetooth_rounded),
                 label: const Text('Connect with Friend'),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PartyGamePairCodeScreen(),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.swap_horiz_rounded),
-                label: const Text('Ask & Answer (Both at Once)'),
               ),
             ),
           ),

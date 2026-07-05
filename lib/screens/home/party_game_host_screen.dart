@@ -54,7 +54,8 @@ class _PartyGameHostScreenState extends State<PartyGameHostScreen> {
 
       // Encode the question id into manufacturer data. Local name is
       // unreliable on Android (esp. Redmi/Xiaomi), so we avoid it.
-      final manufacturerData = Uint8List.fromList([widget.questionId & 0xFF]);
+      // 0xA1 marks this as a QUESTION broadcast (vs 0xA2 for answers).
+      final manufacturerData = Uint8List.fromList([0xA1, widget.questionId & 0xFF]);
 
       final advertiseData = AdvertiseData(
         serviceUuid: '0000DDDD-0000-1000-8000-00805F9B34FB',
@@ -99,9 +100,11 @@ class _PartyGameHostScreenState extends State<PartyGameHostScreen> {
       if (data.length < 3) return;
       if (data[0] != 0xFF || data[1] != 0xFF) return;
 
-      // More than 1 payload byte means this is answer text, not a question id.
-      final payload = data.sublist(2);
-      if (payload.length < 2) return; // question broadcasts are 1 byte
+      // 0xA2 marks this as an ANSWER broadcast - check the marker byte,
+      // not the payload length (a 1-character answer is still valid!).
+      if (data[2] != 0xA2) return;
+      final payload = data.sublist(3);
+      if (payload.isEmpty) return;
 
       final answerText = utf8.decode(payload, allowMalformed: true);
       if (!mounted) return;
