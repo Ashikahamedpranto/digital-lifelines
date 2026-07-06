@@ -4,7 +4,12 @@ import '../../theme/app_theme.dart';
 import 'party_game_duo_screen.dart';
 
 class PartyGamePairCodeScreen extends StatefulWidget {
-  const PartyGamePairCodeScreen({super.key});
+  final Set<String> selectedCategories;
+
+  const PartyGamePairCodeScreen({
+    super.key,
+    this.selectedCategories = const {'photos'},
+  });
 
   @override
   State<PartyGamePairCodeScreen> createState() =>
@@ -34,7 +39,10 @@ class _PartyGamePairCodeScreenState extends State<PartyGamePairCodeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PartyGameDuoScreen(pairCode: code),
+        builder: (_) => PartyGameDuoScreen(
+          pairCode: code,
+          selectedCategories: widget.selectedCategories,
+        ),
       ),
     );
   }

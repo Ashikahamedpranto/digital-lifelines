@@ -4,7 +4,6 @@ import 'firebase_options.dart';
 import 'screens/about/about_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/record/record_screen.dart';
-import 'screens/home/data_discovery_screen.dart';
 import 'theme/app_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/auth/login_screen.dart';
@@ -80,7 +79,6 @@ class _RootNavScreenState extends State<RootNavScreen> {
   final List<Widget> _screens = const [
     HomeScreen(),
     RecordScreen(),
-    DataDiscoveryScreen(),
     AboutScreen(),
   ];
   @override
@@ -110,11 +108,6 @@ class _RootNavScreenState extends State<RootNavScreen> {
             icon: Icon(Icons.edit_note_outlined),
             activeIcon: Icon(Icons.edit_note),
             label: 'Record',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined),
-            activeIcon: Icon(Icons.search),
-            label: 'Data discovery',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),

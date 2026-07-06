@@ -11,13 +11,8 @@ import '../../data/party_questions.dart';
 
 class PartyGameDuoScreen extends StatefulWidget {
   final int pairCode;
-  final Set<String> selectedCategories;
 
-  const PartyGameDuoScreen({
-    super.key,
-    required this.pairCode,
-    this.selectedCategories = const {'photos'},
-  });
+  const PartyGameDuoScreen({super.key, required this.pairCode});
 
   @override
   State<PartyGameDuoScreen> createState() => _PartyGameDuoScreenState();
@@ -255,37 +250,27 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
   }
 
   void _showQuestionPicker() {
-    final filteredQuestions =
-        findQuestionsByCategories(widget.selectedCategories);
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return SafeArea(
-          child: filteredQuestions.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Text(
-                    'No questions available for the selected categories yet.',
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: filteredQuestions.length,
-                  itemBuilder: (context, index) {
-                    final q = filteredQuestions[index];
-                    return ListTile(
-                      leading: const Icon(Icons.help_outline_rounded,
-                          color: AppColors.primary),
-                      title: Text(q.question),
-                      subtitle: Text(q.hint),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _pickQuestion(q);
-                      },
-                    );
-                  },
-                ),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: partyQuestions.length,
+            itemBuilder: (context, index) {
+              final q = partyQuestions[index];
+              return ListTile(
+                leading: const Icon(Icons.help_outline_rounded,
+                    color: AppColors.primary),
+                title: Text(q.question),
+                subtitle: Text(q.hint),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickQuestion(q);
+                },
+              );
+            },
+          ),
         );
       },
     );
