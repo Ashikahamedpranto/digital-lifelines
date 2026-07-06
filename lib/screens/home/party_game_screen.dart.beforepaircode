@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 import 'party_game_connect_screen.dart';
-import 'party_game_pair_code_screen.dart';
+import 'party_game_duo_screen.dart';
 import 'party_game_host_screen.dart';
 import '../../data/party_questions.dart';
 
@@ -80,7 +80,7 @@ class PartyGameScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const PartyGamePairCodeScreen(),
+                      builder: (_) => const PartyGameDuoScreen(),
                     ),
                   );
                 },

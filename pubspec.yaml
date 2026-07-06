@@ -49,6 +49,7 @@ dependencies:
   flutter_ble_peripheral: ^2.1.0
   geolocator: ^13.0.1
   flutter_reactive_ble: ^5.4.0
+  permission_handler: ^11.3.1
 
   photo_manager: ^3.3.0    # read photos
   geocoding: ^3.0.0        # lat/lng to city/country

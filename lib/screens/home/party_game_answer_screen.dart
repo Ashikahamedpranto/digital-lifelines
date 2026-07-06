@@ -69,9 +69,13 @@ class _PartyGameAnswerScreenState extends State<PartyGameAnswerScreen> {
       // distinguishes this from other broadcasts using the 0xFFFF
       // manufacturer id marker plus payload length (>1 byte = answer text,
       // vs 1 byte = question id).
+      // 0xA2 marks this as an ANSWER broadcast (vs 0xA1 for questions).
+      final answerBytes = utf8.encode(truncated);
+      final manufacturerData = Uint8List.fromList([0xA2, ...answerBytes]);
+
       final advertiseData = AdvertiseData(
         manufacturerId: 0xFFFF,
-        manufacturerData: Uint8List.fromList(utf8.encode(truncated)),
+        manufacturerData: manufacturerData,
       );
 
       final advertiseSettings = AdvertiseSettings(

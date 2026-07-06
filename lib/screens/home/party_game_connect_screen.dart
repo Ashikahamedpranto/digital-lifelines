@@ -58,11 +58,12 @@ class _PartyGameConnectScreenState extends State<PartyGameConnectScreen> {
     }
   }
 
-  // Manufacturer data layout we broadcast: [0xFF, 0xFF, questionId]
+  // Manufacturer data layout we broadcast: [0xFF, 0xFF, 0xA1, questionId]
   int? _parseQuestionId(Uint8List data) {
-    if (data.length < 3) return null;
+    if (data.length < 4) return null;
     if (data[0] != 0xFF || data[1] != 0xFF) return null;
-    return data[2];
+    if (data[2] != 0xA1) return null;
+    return data[3];
   }
 
   void _startScan() {

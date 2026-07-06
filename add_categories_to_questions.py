@@ -1,4 +1,10 @@
-class PartyQuestion {
+path = 'lib/data/party_questions.dart'
+with open(path, 'r') as f:
+    content = f.read()
+
+original = content
+
+new_file = """class PartyQuestion {
   final int id;
   final String question;
   final String hint;
@@ -119,3 +125,11 @@ List<PartyQuestion> findQuestionsByCategories(Set<String> categories) {
       .where((q) => categories.contains(q.category))
       .toList();
 }
+"""
+
+if content == new_file:
+    print("NOTHING CHANGED")
+else:
+    with open(path, 'w') as f:
+        f.write(new_file)
+    print("File saved with category field and filtering helper added.")
