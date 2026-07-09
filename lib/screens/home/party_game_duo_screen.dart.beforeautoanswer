@@ -8,7 +8,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../theme/app_theme.dart';
 import '../../data/party_questions.dart';
-import '../../data/party_query_engine.dart';
 
 class PartyGameDuoScreen extends StatefulWidget {
   final int pairCode;
@@ -40,25 +39,6 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
   PartyQuestion? _friendQuestion;
   final TextEditingController _replyController = TextEditingController();
   bool _replySent = false;
-  bool _isComputingReply = false;
-  String? _autoComputedReply;
-
-  Future<void> _computeAutoReply(PartyQuestion question) async {
-    setState(() {
-      _isComputingReply = true;
-    });
-
-    final result = await runQueryForQuestion(question);
-
-    if (!mounted) return;
-    setState(() {
-      _isComputingReply = false;
-      _autoComputedReply = result;
-      if (result != null) {
-        _replyController.text = result;
-      }
-    });
-  }
 
   String? _friendAnswer;
 
@@ -130,12 +110,7 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
             _friendQuestion = question;
             _replySent = false;
             _replyController.clear();
-            _isComputingReply = false;
-            _autoComputedReply = null;
           });
-          if (question.queryType != null) {
-            _computeAutoReply(question);
-          }
         }
       } else if (data[2] == 0xA2) {
         // Friend is broadcasting an answer to our question.
@@ -497,53 +472,6 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    if (_friendQuestion!.queryType != null) ...[
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: _isComputingReply
-                              ? Colors.grey.shade100
-                              : AppColors.accent.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            if (_isComputingReply)
-                              const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            else
-                              Icon(
-                                _autoComputedReply != null
-                                    ? Icons.auto_awesome_rounded
-                                    : Icons.info_outline_rounded,
-                                size: 15,
-                                color: AppColors.accent,
-                              ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _isComputingReply
-                                    ? 'Looking up your answer...'
-                                    : (_autoComputedReply != null
-                                        ? 'Found automatically from your data'
-                                        : 'Could not auto-find - type your own'),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.mutedText,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
                     if (!_replySent) ...[
                       TextField(
                         controller: _replyController,

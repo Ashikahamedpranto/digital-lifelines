@@ -47,8 +47,6 @@ class _PartyGameConnectScreenState extends State<PartyGameConnectScreen> {
     super.dispose();
   }
 
-  bool _connecting = false;
-
   Future<void> _handleMethodCall(MethodCall call) async {
     if (call.method == 'deviceFound') {
       final data = Map<String, dynamic>.from(call.arguments as Map);
@@ -57,34 +55,6 @@ class _PartyGameConnectScreenState extends State<PartyGameConnectScreen> {
       setState(() {
         _foundDevices[id] = data;
       });
-    } else if (call.method == 'questionRead') {
-      final data = Map<String, dynamic>.from(call.arguments as Map);
-      final deviceId = data['deviceId'] as String;
-      final questionId = data['questionId'] as int;
-      final question = findPartyQuestionById(questionId);
-      if (!mounted) return;
-      setState(() {
-        _connecting = false;
-      });
-      if (question != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PartyGameAnswerScreen(
-              question: question,
-              iosDeviceId: deviceId,
-            ),
-          ),
-        );
-      }
-    } else if (call.method == 'connectionFailed') {
-      if (!mounted) return;
-      setState(() {
-        _connecting = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not connect. Try again.')),
-      );
     }
   }
 
@@ -136,15 +106,6 @@ class _PartyGameConnectScreenState extends State<PartyGameConnectScreen> {
   }
 
   void _connectToDevice(Map<String, dynamic> device) {
-    if (Platform.isIOS) {
-      _stopScan();
-      setState(() {
-        _connecting = true;
-      });
-      _channel.invokeMethod('connectAndReadQuestion', {'deviceId': device['id']});
-      return;
-    }
-
     _stopScan();
     final questionId = device['questionId'] as int?;
     final question =

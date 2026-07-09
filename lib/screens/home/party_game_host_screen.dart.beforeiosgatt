@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
@@ -24,8 +22,6 @@ class PartyGameHostScreen extends StatefulWidget {
 }
 
 class _PartyGameHostScreenState extends State<PartyGameHostScreen> {
-  static const _channel = MethodChannel('digital_lifelines/ble_scanner');
-
   final FlutterBlePeripheral _peripheral = FlutterBlePeripheral();
   final FlutterReactiveBle _ble = FlutterReactiveBle();
   StreamSubscription<DiscoveredDevice>? _answerScanSubscription;
@@ -35,30 +31,9 @@ class _PartyGameHostScreenState extends State<PartyGameHostScreen> {
   String? _receivedAnswer;
 
   @override
-  void initState() {
-    super.initState();
-    if (Platform.isIOS) {
-      _channel.setMethodCallHandler(_handleMethodCall);
-    }
-  }
-
-  Future<void> _handleMethodCall(MethodCall call) async {
-    if (!mounted) return;
-    if (call.method == 'answerReceived') {
-      final data = Map<String, dynamic>.from(call.arguments as Map);
-      setState(() {
-        _receivedAnswer = data['answer'] as String;
-      });
-    }
-  }
-
-  @override
   void dispose() {
     _peripheral.stop();
     _answerScanSubscription?.cancel();
-    if (Platform.isIOS) {
-      _channel.invokeMethod('stopHosting');
-    }
     super.dispose();
   }
 
@@ -67,15 +42,6 @@ class _PartyGameHostScreenState extends State<PartyGameHostScreen> {
       _errorMessage = null;
       _receivedAnswer = null;
     });
-
-    if (Platform.isIOS) {
-      await _channel.invokeMethod('startHosting', {'questionId': widget.questionId});
-      if (!mounted) return;
-      setState(() {
-        _isAdvertising = true;
-      });
-      return;
-    }
 
     try {
       final isSupported = await _peripheral.isSupported;
@@ -151,14 +117,6 @@ class _PartyGameHostScreenState extends State<PartyGameHostScreen> {
   }
 
   Future<void> _stopHosting() async {
-    if (Platform.isIOS) {
-      await _channel.invokeMethod('stopHosting');
-      if (!mounted) return;
-      setState(() {
-        _isAdvertising = false;
-      });
-      return;
-    }
     await _peripheral.stop();
     _answerScanSubscription?.cancel();
     if (!mounted) return;
