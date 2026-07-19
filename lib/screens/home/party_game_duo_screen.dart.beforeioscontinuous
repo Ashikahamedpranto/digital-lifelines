@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -28,7 +26,6 @@ class PartyGameDuoScreen extends StatefulWidget {
 
 class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
   static const int _maxAnswerLength = 20;
-  static const _channel = MethodChannel('digital_lifelines/ble_scanner');
 
   final FlutterBlePeripheral _peripheral = FlutterBlePeripheral();
   final FlutterReactiveBle _ble = FlutterReactiveBle();
@@ -45,16 +42,6 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
   bool _replySent = false;
   bool _isComputingReply = false;
   String? _autoComputedReply;
-
-  String? _friendAnswer;
-
-  Timer? _scanRestartTimer;
-
-  // --- iOS-only state ---
-  String? _iosFriendDeviceId;
-  bool _iosHostingStarted = false;
-  Timer? _iosPollTimer;
-  final Set<String> _iosAttemptedDeviceIds = {};
 
   Future<void> _computeAutoReply(PartyQuestion question) async {
     setState(() {
@@ -73,160 +60,34 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
     });
   }
 
+  String? _friendAnswer;
+
+  Timer? _scanRestartTimer;
+
   @override
   void initState() {
     super.initState();
-    if (Platform.isIOS) {
-      _channel.setMethodCallHandler(_handleIosMethodCall);
-      _channel.invokeMethod('startScan');
-      // GATT reads only happen when explicitly triggered - this timer
-      // periodically re-reads the friend's question characteristic so we
-      // notice if they picked a new question, or if our pending approval
-      // request finally got accepted.
-      _iosPollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-        if (_iosFriendDeviceId != null) {
-          _channel.invokeMethod(
-              'rereadQuestion', {'deviceId': _iosFriendDeviceId});
-        }
-      });
-    } else {
-      _requestPermissionsThenListen();
-      // Android's BLE scanner can stop reporting fresh advertisement
-      // updates for a device it has already "seen" once, especially when
-      // that device's payload changes (like when a friend picks a new
-      // question). Periodically restarting the scan forces it to treat
-      // every device as new again, so updated broadcasts get picked up
-      // reliably.
-      _scanRestartTimer = Timer.periodic(const Duration(seconds: 12), (_) {
-        _scanSubscription?.cancel();
-        _startListening();
-      });
-    }
+    _requestPermissionsThenListen();
+    // Android's BLE scanner can stop reporting fresh advertisement updates
+    // for a device it has already "seen" once, especially when that
+    // device's payload changes (like when a friend picks a new question).
+    // Periodically restarting the scan forces it to treat every device as
+    // new again, so updated broadcasts get picked up reliably.
+    _scanRestartTimer = Timer.periodic(const Duration(seconds: 12), (_) {
+      _scanSubscription?.cancel();
+      _startListening();
+    });
   }
 
   @override
   void dispose() {
-    if (Platform.isIOS) {
-      _iosPollTimer?.cancel();
-      _channel.invokeMethod('stopHosting');
-      _channel.invokeMethod('stopScan');
-    } else {
-      _scanSubscription?.cancel();
-      _scanRestartTimer?.cancel();
-      _resumeQuestionTimer?.cancel();
-      _peripheral.stop();
-    }
+    _scanSubscription?.cancel();
+    _scanRestartTimer?.cancel();
+    _resumeQuestionTimer?.cancel();
+    _peripheral.stop();
     _replyController.dispose();
     super.dispose();
   }
-
-  // MARK: - iOS-specific handling
-
-  Future<void> _handleIosMethodCall(MethodCall call) async {
-    if (!mounted) return;
-    switch (call.method) {
-      case 'deviceFound':
-        final data = Map<String, dynamic>.from(call.arguments as Map);
-        final name = data['name'] as String? ?? '';
-        final deviceId = data['id'] as String;
-        final expectedName = 'BLS${widget.pairCode}';
-        if (name == expectedName &&
-            !_iosAttemptedDeviceIds.contains(deviceId)) {
-          _iosAttemptedDeviceIds.add(deviceId);
-          _channel
-              .invokeMethod('connectAndReadQuestion', {'deviceId': deviceId});
-        }
-        break;
-
-      case 'questionRead':
-        final data = Map<String, dynamic>.from(call.arguments as Map);
-        final deviceId = data['deviceId'] as String;
-        final questionId = data['questionId'] as int;
-        final question = findPartyQuestionById(questionId);
-        if (question == null) return;
-        final isNewQuestion = _friendQuestion?.id != question.id;
-        setState(() {
-          _iosFriendDeviceId = deviceId;
-          if (isNewQuestion) {
-            _friendQuestion = question;
-            _replySent = false;
-            _replyController.clear();
-            _isComputingReply = false;
-            _autoComputedReply = null;
-          }
-        });
-        if (isNewQuestion && question.queryType != null) {
-          _computeAutoReply(question);
-        }
-        break;
-
-      case 'connectionPending':
-        final data = Map<String, dynamic>.from(call.arguments as Map);
-        setState(() {
-          _iosFriendDeviceId = data['deviceId'] as String;
-        });
-        break;
-
-      case 'connectionRequest':
-        final data = Map<String, dynamic>.from(call.arguments as Map);
-        final deviceId = data['deviceId'] as String;
-        _showConnectionRequestDialog(deviceId);
-        break;
-
-      case 'answerReceived':
-        final data = Map<String, dynamic>.from(call.arguments as Map);
-        setState(() {
-          _friendAnswer = data['answer'] as String;
-        });
-        break;
-
-      case 'answerSent':
-        setState(() {
-          _replySent = true;
-        });
-        break;
-
-      case 'answerSendFailed':
-        setState(() {
-          _errorMessage = 'Failed to send answer. Try again.';
-        });
-        break;
-    }
-  }
-
-  void _showConnectionRequestDialog(String deviceId) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Connection Request'),
-        content: const Text(
-          'Someone with your pair code wants to connect and exchange '
-          'questions with you. Accept?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _channel
-                  .invokeMethod('rejectConnection', {'deviceId': deviceId});
-            },
-            child: const Text('Reject'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _channel
-                  .invokeMethod('acceptConnection', {'deviceId': deviceId});
-            },
-            child: const Text('Accept'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // MARK: - Android-specific handling (unchanged)
 
   Future<void> _requestPermissionsThenListen() async {
     // Android needs these granted at runtime, not just declared in the
@@ -291,6 +152,15 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
     });
   }
 
+  Future<void> _pickQuestion(PartyQuestion question) async {
+    setState(() {
+      _myQuestion = question;
+      _friendAnswer = null;
+      _errorMessage = null;
+    });
+    await _startBroadcastingQuestion();
+  }
+
   Future<void> _startBroadcastingQuestion() async {
     if (_myQuestion == null) return;
     try {
@@ -336,60 +206,12 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
     }
   }
 
-  // MARK: - Shared entry points (branch by platform)
-
-  Future<void> _pickQuestion(PartyQuestion question) async {
-    setState(() {
-      _myQuestion = question;
-      _friendAnswer = null;
-      _errorMessage = null;
-    });
-
-    if (Platform.isIOS) {
-      if (_iosHostingStarted) {
-        await _channel
-            .invokeMethod('updateHostedQuestion', {'questionId': question.id});
-      } else {
-        await _channel.invokeMethod('startHosting', {
-          'questionId': question.id,
-          'pairCode': widget.pairCode,
-        });
-        _iosHostingStarted = true;
-      }
-      if (!mounted) return;
-      setState(() {
-        _isBroadcastingQuestion = true;
-      });
-      return;
-    }
-
-    await _startBroadcastingQuestion();
-  }
-
   Future<void> _sendReply() async {
     final replyText = _replyController.text.trim();
     if (replyText.isEmpty) {
       setState(() {
         _errorMessage = 'Please type an answer first.';
       });
-      return;
-    }
-
-    if (Platform.isIOS) {
-      if (_iosFriendDeviceId == null) {
-        setState(() {
-          _errorMessage = 'Not connected to your friend yet.';
-        });
-        return;
-      }
-      final truncated = replyText.length > _maxAnswerLength
-          ? replyText.substring(0, _maxAnswerLength)
-          : replyText;
-      await _channel.invokeMethod('sendAnswer', {
-        'deviceId': _iosFriendDeviceId,
-        'answer': truncated,
-      });
-      // _replySent gets set once the 'answerSent' callback comes back.
       return;
     }
 
