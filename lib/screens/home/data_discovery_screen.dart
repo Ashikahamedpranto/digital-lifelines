@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 import '../../database/db_helper.dart';
-import 'data_discovery_consent_screen.dart';
+import 'data_discovery_search_screen.dart';
 
 class DataDiscoveryScreen extends StatefulWidget {
   const DataDiscoveryScreen({super.key});
@@ -36,7 +36,7 @@ class _DataDiscoveryScreenState extends State<DataDiscoveryScreen> {
         backgroundColor: AppColors.background,
         scrolledUnderElevation: 0.5,
         title: const Text(
-          'Data Discovery Mode',
+          'Discover something you didn\'t know',
           style: TextStyle(
             fontWeight: FontWeight.w800,
             color: AppColors.appBarText,
@@ -49,6 +49,97 @@ class _DataDiscoveryScreenState extends State<DataDiscoveryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const Text(
+              'One question. One yes. One real answer.',
+              style: TextStyle(
+                fontSize: 15,
+                color: AppColors.mutedText,
+              ),
+            ),
+            const SizedBox(height: 28),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                _StepIcon(
+                  icon: Icons.radio_button_unchecked_rounded,
+                  label: 'Connect',
+                  caption: 'Bump phones',
+                ),
+                _StepIcon(
+                  icon: Icons.crop_square_rounded,
+                  label: 'Ask',
+                  caption: 'Send a question',
+                ),
+                _StepIcon(
+                  icon: Icons.access_time_rounded,
+                  label: 'Reveal',
+                  caption: 'Get an answer',
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            const Divider(height: 1),
+            const SizedBox(height: 24),
+            const Text(
+              'WHY IT\'S DIFFERENT',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+                color: AppColors.mutedText,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'They choose what to share, before they know what '
+              'you\'ll ask.',
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.5,
+                color: AppColors.appBarText,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'They approve answering before they even see the answer.',
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.5,
+                color: AppColors.appBarText,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Say no, and we\'ll show you who already knows anyway.',
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.5,
+                color: AppColors.appBarText,
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DataDiscoverySearchScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Start discovering',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -59,96 +150,62 @@ class _DataDiscoveryScreenState extends State<DataDiscoveryScreen> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.my_location_rounded),
+                    : const Icon(Icons.my_location_rounded, size: 18),
                 label: Text(_isBackfilling
                     ? 'Backfilling...'
                     : 'Backfill photo coordinates (dev)'),
               ),
             ),
-            const SizedBox(height: 16),
-            InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const DataDiscoveryConsentScreen(
-                      friendName: 'Bob',
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                height: 150,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    style: BorderStyle.solid,
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.search_rounded,
-                        color: AppColors.mutedText, size: 22),
-                    SizedBox(width: 10),
-                    Text(
-                      'Search for other timelines',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.mutedText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            const Text(
-              'Welcome to Data Discovery Mode.',
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 22,
-                color: AppColors.appBarText,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'You can compare data with others who have the Digital '
-              'Lifelines app. Simply click "Search for other timelines", '
-              'bump phones with the other user, and choose the data '
-              'sources that you consent to share in the menu with your '
-              'timelines. The person who you compare data with will also '
-              'select data sources that they consent to share. You and '
-              'the other user will receive questions to ask based on the '
-              'data sources you both consented to share. Then, you will '
-              'choose the questions you\'re interested in asking the '
-              'other person. After the other person approves them, the '
-              'app will display the answers to them.',
-              style: const TextStyle(
-                fontSize: 15,
-                height: 1.5,
-                color: AppColors.appBarText,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'We hope that this creates an experience where both '
-              'people, making more out of their personal data, are able '
-              'to learn new and cool insights about each other that they '
-              'wouldn\'t have known otherwise.',
-              style: const TextStyle(
-                fontSize: 15,
-                height: 1.5,
-                color: AppColors.appBarText,
-              ),
-            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _StepIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String caption;
+
+  const _StepIcon({
+    required this.icon,
+    required this.label,
+    required this.caption,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: AppColors.primary, size: 24),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+            color: AppColors.appBarText,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          caption,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppColors.mutedText,
+          ),
+        ),
+      ],
     );
   }
 }
