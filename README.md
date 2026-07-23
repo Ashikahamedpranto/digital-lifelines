@@ -25,7 +25,6 @@ Fix anything marked with a red ✗ before continuing.
 ```bash
 git clone https://github.com/Ashikahamedpranto/digital-lifelines.git
 cd digital-lifelines
-git checkout ashik/ios-duo-continuous
 ```
 
 ## 3. Install dependencies
