@@ -173,37 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          // Logout button
-          IconButton(
-            tooltip: 'Logout',
-            onPressed: () async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Logout'),
-                  content: const Text('Are you sure you want to logout?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Logout'),
-                    ),
-                  ],
-                ),
-              );
-              if (confirmed == true) {
-                await DBHelper.instance.clearAllData();
-                await FirebaseAuth.instance.signOut();
-              }
-            },
-            icon: const Icon(
-              Icons.logout_rounded,
-              color: AppColors.mutedText,
-            ),
-          ),
           // Refresh button (existing)
           Container(
             margin: const EdgeInsets.only(right: 8),
@@ -252,24 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const PartyGameScreen(),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.celebration_rounded),
-                      label: const Text('Party Game'),
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: _timelines.isEmpty
                       ? _EmptyHomeState(onCreate: _openCreateTimeline)
