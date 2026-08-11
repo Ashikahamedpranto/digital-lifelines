@@ -30,6 +30,8 @@
         <string>Digital Lifelines needs access to your photos to extract location data and build your My Places timeline.</string>
         <key>NSLocationWhenInUseUsageDescription</key>
         <string>Digital Lifelines uses your photo location data to show where your photos were taken.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>Digital Lifelines uses your location to show where your photos were taken and to power party game features.</string>
         <key>NSBluetoothAlwaysUsageDescription</key>
         <string>Digital Lifelines uses Bluetooth to connect with nearby friends for the Party Game feature.</string>
         <key>NSBluetoothPeripheralUsageDescription</key>
