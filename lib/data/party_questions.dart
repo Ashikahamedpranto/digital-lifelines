@@ -2,7 +2,7 @@ class PartyQuestion {
   final int id;
   final String question;
   final String hint;
-  final String category; // 'photos', 'books', or 'movies'
+  final String category; // 'photos', 'location', 'books', or 'movies'
 
   // If set, the app computes the answer automatically from the
   // recipient's own real data instead of asking them to type one in.
@@ -34,7 +34,7 @@ const List<PartyQuestion> partyQuestions = [
     id: 1,
     question: 'Outside New York, where were you last December?',
     hint: 'Check My Places -> Per Month view',
-    category: 'photos',
+    category: 'location',
     queryType: 'mostFrequentFieldValueFiltered',
     targetTimeline: 'My Places',
     targetField: 'city',
@@ -45,7 +45,7 @@ const List<PartyQuestion> partyQuestions = [
     id: 2,
     question: 'How many countries have you visited?',
     hint: 'Check My Places -> Places view',
-    category: 'photos',
+    category: 'location',
     queryType: 'distinctFieldValueCount',
     targetTimeline: 'My Places',
     targetField: 'country',
@@ -54,7 +54,7 @@ const List<PartyQuestion> partyQuestions = [
     id: 3,
     question: 'What city do you have the most photos in?',
     hint: 'Check My Places -> Places view',
-    category: 'photos',
+    category: 'location',
     queryType: 'mostFrequentFieldValue',
     targetTimeline: 'My Places',
     targetField: 'city',
@@ -63,7 +63,7 @@ const List<PartyQuestion> partyQuestions = [
     id: 4,
     question: 'What is the farthest place you have been from Potsdam?',
     hint: 'Check My Places -> Per Photo view',
-    category: 'photos',
+    category: 'location',
     queryType: 'farthestFromPotsdam',
     targetTimeline: 'My Places',
     targetField: 'city',
@@ -81,7 +81,7 @@ const List<PartyQuestion> partyQuestions = [
     id: 6,
     question: 'What country do you have the most photos in?',
     hint: 'Check My Places -> Places view',
-    category: 'photos',
+    category: 'location',
     queryType: 'mostFrequentFieldValue',
     targetTimeline: 'My Places',
     targetField: 'country',
@@ -99,7 +99,7 @@ const List<PartyQuestion> partyQuestions = [
     id: 8,
     question: 'Is there a place you visited only once?',
     hint: 'Check My Places -> Places view (look for count of 1)',
-    category: 'photos',
+    category: 'location',
     queryType: 'singleOccurrenceFieldValue',
     targetTimeline: 'My Places',
     targetField: 'city',

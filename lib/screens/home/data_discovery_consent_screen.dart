@@ -19,9 +19,7 @@ class DataDiscoveryConsentScreen extends StatefulWidget {
 class _DataDiscoveryConsentScreenState
     extends State<DataDiscoveryConsentScreen> {
   final Map<String, bool> _categories = {
-    'Books': false,
     'Photos': false,
-    'Movies': false,
     'Location': false,
   };
 
@@ -30,9 +28,7 @@ class _DataDiscoveryConsentScreenState
 
   static const Map<String, String> _labelToCategoryKey = {
     'Photos': 'photos',
-    'Location': 'photos',
-    'Books': 'books',
-    'Movies': 'movies',
+    'Location': 'location',
   };
 
   void _submit() {
