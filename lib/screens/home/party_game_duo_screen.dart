@@ -495,9 +495,12 @@ class _PartyGameDuoScreenState extends State<PartyGameDuoScreen> {
   }
 
   String get _broadcastStatusLabel {
+    if (_iosFriendDeviceId != null || _friendQuestion != null) {
+      return 'Connected to friend!';
+    }
     if (_isBroadcastingAnswer) return 'Sending your answer...';
     if (_isBroadcastingQuestion) return 'Broadcasting your question...';
-    return 'Not broadcasting';
+    return 'Searching for nearby friend...';
   }
 
   @override
