@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
     // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -30,20 +31,6 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-    }
-
-    flavorDimensions += "version"
-    productFlavors {
-        create("full") {
-            dimension = "version"
-            applicationId = "edu.clarkson.cs550.digital_lifelines"
-            resValue("string", "app_name", "Digital Lifelines")
-        }
-        create("lite") {
-            dimension = "version"
-            applicationId = "edu.clarkson.cs550.digital_lifelines.lite"
-            resValue("string", "app_name", "Where Have You Been All My Life?")
-        }
     }
 
     buildTypes {

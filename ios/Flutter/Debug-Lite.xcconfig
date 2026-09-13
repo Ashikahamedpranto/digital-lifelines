@@ -1,0 +1,4 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug-lite.xcconfig"
+#include "Generated.xcconfig"
+PRODUCT_BUNDLE_IDENTIFIER = edu.clarkson.cs550.digitalLifelines.lite
+PRODUCT_NAME = Where Have You Been All My Life

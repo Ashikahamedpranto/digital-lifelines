@@ -65,7 +65,7 @@ class DataDiscoverySearchScreen extends StatelessWidget {
                         color: AppColors.mutedText, size: 22),
                     SizedBox(width: 10),
                     Text(
-                      'Search timelines',
+                      'Search for other timelines',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
